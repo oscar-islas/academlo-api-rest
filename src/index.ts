@@ -1,13 +1,14 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import shopRoutes from './routes/shop';
+import mongooseDriver from 'mongoose';
 
 const app = express();
 
 //application/json
-app.use(bodyParser.json()); 
+app.use(bodyParser.json());
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type: application/json');
@@ -19,5 +20,9 @@ app.use((req, res, next) => {
 
 app.use('/admin', shopRoutes);
 
-
-app.listen(3000, () => { console.log("Escuchando sobre el puerto 8080"); });
+mongooseDriver.connect('mongodb+srv://oislasreyes:sp0ugXGWboofWwAh@cluster0-znugo.mongodb.net/ecommerce_db?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+    console.log("Conexión con la base de datos establecida");
+    app.listen(8080, () => { console.log("Escuchando sobre el puerto 8080"); });
+}).catch(error => {
+    console.log(error);
+});
