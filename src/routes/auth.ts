@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/signup', authController.signup);
 
-router.post('/login');
+router.post('/login', authController.login);
 
 router.post('/verify', (req, res) => {
     const token = req.body.token;

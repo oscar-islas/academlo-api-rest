@@ -35,4 +35,36 @@ const signup = (req: Request, res: Response) => {
     }
 }
 
-export default {signup}
+
+const login = (req: Request, res: Response) => {
+    let {email, password} = req.body;
+    
+    if(password && email){
+        //Comprobar que el usuario no se encuentre registrado
+        User.findOne({email: email}).then( user => {
+            if(user){
+                //Si no está registrado lo agregaremos en la BD                
+                bcrypt.compare(password, user.password).then( (resultado) => {
+                    if(resultado){
+                        console.log(user);
+                        console.log("Se ha iniciado sesión correctamente");
+                        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '1h'});
+                        res.json({
+                            message: "Se ha iniciado sesión correctamente",
+                            token: token
+                        });
+                    }else{
+                        console.log("Credenciales incorrectas");
+                    }
+                }).catch( error => console.log(error));
+            }else{
+                res.json({
+                    message: "El usuario no se encuentra registrado en nuestro sistema"
+                });
+            }
+        });        
+    }
+}
+
+
+export default {signup, login}
