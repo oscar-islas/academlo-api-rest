@@ -8,6 +8,7 @@ import mongooseDriver from 'mongoose';
 import env from 'dotenv';
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
+import auth from './middleware/auth';
 
 const NODE_ENV = process.env.NODE_ENV; //Obteniendo el entorno de desarrollo 
 env.config({ path: `.env.${NODE_ENV}`}); //Cargamos el archivo de variables de entorno 
@@ -30,9 +31,6 @@ app.get('/csrf', (req, res) => {
     })
 });
 
-
-
-
 app.use((req, res, next) => {
     console.log(req.cookies.token);
     next();
@@ -42,7 +40,7 @@ app.use((req, res, next) => {
 // app.use(bodyParser.urlencoded()); 
 app.use(authRoutes);
 app.use(userRoutes);
-app.use('/admin', shopRoutes);
+app.use('/admin', auth, shopRoutes);
 
 
 mongooseDriver.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0-znugo.mongodb.net/ecommerce_db?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {

@@ -1,6 +1,8 @@
 import express from 'express';
 // import shopController from '../controllers/shop';
 import {welcome, getProducts, postProduct, putProduct, deleteProduct} from '../controllers/shop';
+
+
 const router = express.Router();
 
 router.get('/', welcome);

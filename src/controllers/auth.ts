@@ -46,7 +46,7 @@ const login = (req: Request, res: Response) => {
                 //Comparar la contraseña de la base de datos con la que recibimos del cliente                               
                 bcrypt.compare(password, user.password).then( (resultado) => {
                     if(resultado){                        
-                        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '1h'});
+                        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '10 days'});
                         res.cookie('token', token, {httpOnly: true});
                         res.json({
                             message: "Se ha iniciado sesión correctamente"                            
