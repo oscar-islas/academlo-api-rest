@@ -43,18 +43,19 @@ const login = (req: Request, res: Response) => {
         //Comprobar que el usuario no se encuentre registrado
         User.findOne({email: email}).then( user => {
             if(user){
-                //Si no está registrado lo agregaremos en la BD                
+                //Comparar la contraseña de la base de datos con la que recibimos del cliente                               
                 bcrypt.compare(password, user.password).then( (resultado) => {
-                    if(resultado){
-                        console.log(user);
-                        console.log("Se ha iniciado sesión correctamente");
+                    if(resultado){                        
                         const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '1h'});
+                        res.cookie('token', token, {httpOnly: true});
                         res.json({
-                            message: "Se ha iniciado sesión correctamente",
-                            token: token
+                            message: "Se ha iniciado sesión correctamente"                            
                         });
                     }else{
                         console.log("Credenciales incorrectas");
+                        res.json({
+                            message: "Las credenciales de acceso son incorrectas"                            
+                        });
                     }
                 }).catch( error => console.log(error));
             }else{
