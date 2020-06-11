@@ -53,6 +53,11 @@ app.post('/upload-many', upload.array('files', 5), (req, res) => {
     });
 });
 
+app.use(express.static(path.join(__dirname, 'uploads')));
+// app.get('/get-image', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'uploads', 'img-slider2.png'));
+// })
+
 app.use(csurfProtection);
 
 app.get('/csrf', (req, res) => {
