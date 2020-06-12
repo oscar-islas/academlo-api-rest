@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import bodyParser, { urlencoded } from 'body-parser';
 import shopRoutes from './routes/shop';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
@@ -37,6 +37,7 @@ const upload = multer({storage: storage, limits: {fileSize: 3096000}});
 
 //application/json
 app.use(bodyParser.json());
+app.use(urlencoded());
 
 app.use(cors());
 
