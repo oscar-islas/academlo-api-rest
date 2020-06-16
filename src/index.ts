@@ -12,6 +12,8 @@ import auth from './middleware/auth';
 import multer from 'multer';
 import path from 'path';
 import IError from './models/IError';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './api';
 
 const NODE_ENV = process.env.NODE_ENV; //Obteniendo el entorno de desarrollo 
 env.config({ path: `.env.${NODE_ENV}`}); //Cargamos el archivo de variables de entorno 
@@ -42,6 +44,7 @@ app.use(urlencoded());
 app.use(cors());
 
 app.use(cookieParser());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.post('/upload', upload.single('file'), (req, res) => {
     res.json({
