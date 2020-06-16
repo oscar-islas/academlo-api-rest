@@ -1,4 +1,4 @@
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 import fs from 'fs';
 import path from 'path';
 import Product from '../models/products';
@@ -9,19 +9,22 @@ export const welcome = (req: Request, res: Response) => {
     });
 };
 
-export const getProducts = (req: Request, res: Response) => {
+export const getProducts = (req: Request, res: Response, next: NextFunction) => {
     let products = [];
     //1 -> Ascendente
     //-1 -> Descendente
     Product.find().sort({price: 1}).then( productsDoc => {
-        products = productsDoc;
+        products = productsDoc;        
         res.json(products);
     }).catch(error => {
         console.log(error);
+        error.message = "Hubo un error al obtener los productos";
+        error.code = 400;
+        next(error);
     });
 };
 
-export const postProduct = (req: Request, res: Response) => {
+export const postProduct = (req: Request, res: Response, next: NextFunction) => {
     const newProduct = new Product({...req.body});
     newProduct.save().then(() => {
         console.log("Se ha agregado el producto correctamente")
@@ -31,6 +34,9 @@ export const postProduct = (req: Request, res: Response) => {
         });
     }).catch( error => {
         console.log(error);
+        error.message = "Hubo un error al tratar de agregar el producto en el sistema";
+        error.code = 400;
+        next(error);
     });
 }
 

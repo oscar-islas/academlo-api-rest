@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import bodyParser, { urlencoded } from 'body-parser';
 import shopRoutes from './routes/shop';
@@ -11,6 +11,7 @@ import csurf from 'csurf';
 import auth from './middleware/auth';
 import multer from 'multer';
 import path from 'path';
+import IError from './models/IError';
 
 const NODE_ENV = process.env.NODE_ENV; //Obteniendo el entorno de desarrollo 
 env.config({ path: `.env.${NODE_ENV}`}); //Cargamos el archivo de variables de entorno 
@@ -67,7 +68,7 @@ app.get('/csrf', (req, res) => {
     })
 });
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(req.cookies.token);
     next();
 });
@@ -78,6 +79,12 @@ app.use(authRoutes);
 app.use(userRoutes);
 app.use('/admin', auth, shopRoutes);
 
+app.use((error: IError, req: Request, res: Response, next: NextFunction) => {
+    let code = error.code || 500;
+    res.status(code).json({
+        message: error.message
+    });
+});
 
 mongooseDriver.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0-znugo.mongodb.net/ecommerce_db?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
     console.log("Conexión con la base de datos establecida");

@@ -1,9 +1,19 @@
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
+import {validationResult} from 'express-validator';
 
-const signup = (req: Request, res: Response) => {
+const signup = (req: Request, res: Response, next: NextFunction) => {    
+    let errors: any = validationResult(req);
+
+    //false si hay errores | true si no hay errores
+    if(!errors.isEmpty()){
+        errors.code = 400;
+        errors.message = errors.array();
+        return next(errors);
+    }
+
     let {name, password, email} = req.body;
     
     if(password && email){
