@@ -9,13 +9,27 @@ export const welcome = (req: Request, res: Response) => {
     });
 };
 
-export const getProducts = (req: Request, res: Response, next: NextFunction) => {
+export const getProducts = async (req: Request, res: Response, next: NextFunction) => {
     let products = [];
+    const page = Number(req.query.page) >= 1 ? Number(req.query.page) : 1;
+    const limit = Number(req.query.limit);
+    const documents = await Product.countDocuments();
+    const totalPages = Math.ceil(documents/limit);
     //1 -> Ascendente
     //-1 -> Descendente
-    Product.find().sort({price: 1}).then( productsDoc => {
-        products = productsDoc;        
-        res.json(products);
+    Product.find().skip((page - 1) * limit).limit(limit).sort({price: 1}).then( results => {
+        products = results;        
+        res.json({
+            totalResults: documents,
+            limit: limit,
+            page: page,
+            totalPages: totalPages,
+            hasPreviousPage: page > 1 ? true : false,
+            hasNextPage: results.length >= limit ? true : false,
+            prevPage: (page - 1) < 1 ? 1 : page-1,
+            nextPage: (page + 1) >= totalPages ? totalPages : page + 1,            
+            data: products
+        });
     }).catch(error => {
         console.log(error);
         error.message = "Hubo un error al obtener los productos";

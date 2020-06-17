@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import {sendResetEmail} from './mail';
 
 const getUsers = async (req: Request, res: Response) => {
-    const page = Number(req.query.page);
+    const page = Number(req.query.page) >= 1 ? Number(req.query.page) : 1;
     const limit = Number(req.query.limit);
     const documents = await User.countDocuments();
     //Para la primera página -> primeros dos usuarios
@@ -24,9 +24,9 @@ const getUsers = async (req: Request, res: Response) => {
             page: page,
             totalPages: Math.ceil(documents/limit),
             hasPreviousPage: page > 1 ? true : false,
-            hasNextPage: false,
-            prevPage: 0,
-            nextPage: 2,
+            hasNextPage: results.length >= limit ? true : false,
+            prevPage: (page - 1) < 1 ? 1 : page-1,
+            nextPage: page + 1,
             data: results
         });
     });
