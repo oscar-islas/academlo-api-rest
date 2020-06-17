@@ -3,9 +3,32 @@ import User from '../models/user';
 import bcrypt from 'bcryptjs';
 import {sendResetEmail} from './mail';
 
-const getUsers = (req: Request, res: Response) => {
-    User.find().then( results => {
-        res.json(results);
+const getUsers = async (req: Request, res: Response) => {
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+    const documents = await User.countDocuments();
+    //Para la primera página -> primeros dos usuarios
+    //Page = 2 -> usuario 3 y 4
+    //Page = 3 -> usuario 5 y 6
+    //Page = 4 -> usuario 7 y 8
+    // (1-1)*2 = 0 --> Primera página no estamos excluyendo a ningún usuario
+    // (2-1)*2 = 2 --> Excluyendo los dos primeros usuarios [3, 4, 5, 6, 7] -> limit 2 [3, 4]
+    // (3-1)*2 = 4 --> Excluyendo los primeros 4 usuarios [5, 6, 7] -> limit 2 [5, 6]
+    // numeroRegistros/limite 7/2 = 3.5 -> 4
+    // 7/3 = 2.3 -> 3 [1, 2, 3], [4, 5, 6], [7]
+    // Math.ceil
+    User.find().skip((page - 1) * limit).limit(limit).then( results => {
+        res.json({
+            totalResults: documents,
+            limit: limit,
+            page: page,
+            totalPages: Math.ceil(documents/limit),
+            hasPreviousPage: page > 1 ? true : false,
+            hasNextPage: false,
+            prevPage: 0,
+            nextPage: 2,
+            data: results
+        });
     });
 }
 
