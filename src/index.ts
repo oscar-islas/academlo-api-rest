@@ -19,6 +19,7 @@ const NODE_ENV = process.env.NODE_ENV; //Obteniendo el entorno de desarrollo
 env.config({ path: `.env.${NODE_ENV}`}); //Cargamos el archivo de variables de entorno 
 
 const app = express();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const csurfProtection = csurf({cookie: true}); //Token CSRF -> Cross-site Request Forgery
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -44,7 +45,6 @@ app.use(urlencoded());
 app.use(cors());
 
 app.use(cookieParser());
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.post('/upload', upload.single('file'), (req, res) => {
     res.json({

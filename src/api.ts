@@ -12,9 +12,18 @@ export default {
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
+    "tags": [
+        {
+        "name": "Authorization",
+        "description": "Rutas para poder manejar la autenticación y el registro de usuarios"
+    }, {
+        "name": "Users",
+        "description": "Rutas para administrar los usuarios"
+    }],
     "paths": {
         "/signup": {
             "post": {
+                "tags": ["Authorization", "Users"],
                 "description": "Registra un usuario en el sistema",
                 "parameters": [
                     {
@@ -34,7 +43,25 @@ export default {
                     "default": {
                         "description": "successful operation"
                     }
-                }
+                },
+                "security":[{
+                    "CSRF-Token": []
+                }]
+
+            }
+        },
+        "/csrf": {
+            "get": {
+                "tags": ["Authorization"],
+                "description": "Obtiene un token CSRF",                
+                "responses": {
+                    "405": {
+                        "description": "Invalid input"
+                    },
+                    "default": {
+                        "description": "successful operation"
+                    }
+                },               
             }
         }
     },
@@ -58,6 +85,18 @@ export default {
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions":{
+        "CSRF-Token": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "CSRF-Token"
+        },
+        "JWT":{
+            "type": "apiKey",
+            "in": "cookie",
+            "name": "token"
         }
     }
 }
